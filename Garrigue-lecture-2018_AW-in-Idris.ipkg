@@ -1,0 +1,9 @@
+package Garrigue-lecture-2018_AW-in-Idris
+
+version = "0.1.0"
+author = "κeen <3han5chou7@gmail.com>"
+
+sourcedir = src
+modules = Idris1
+opts = "--check --total -X ElabReflection"
+pkgs = pruviloj
