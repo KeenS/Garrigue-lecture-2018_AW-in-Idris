@@ -139,12 +139,6 @@ namespace Z -- 定義の範囲を区切るために namespace を使う
 
 -- 練習問題 2.1 Z の中で二つの整数値の平均を計算する関数 heikin : Z -> Z -> Z を定義せよ
 -- メモ: Idrisのインターフェイス的に以下のheikinは全関数でない可能性がある
--- heikin : Integer -> Integer -> Integer
--- heikin x y = (x + y) `div` 2
--- λΠ> heikin 1 2
--- 1 : Integer
--- λΠ> heikin 8 2
--- 5 : Integer
 
 
 -- データ型の定義
@@ -224,11 +218,6 @@ namespace Play3
   play t1 t2 t3 = Aiko
 
   -- 練習問題 2.2 Play3.play を正しく定義せよ
-  -- play : (t1 : Janken) -> (t2 : Janken) -> (t3 : Janken) -> Winner
-  -- play t1 t2 t3 = if wins t1 t2 && wins t1 t3 then First else
-  --                 if wins t2 t1 && wins t2 t3 then Second else
-  --                 if wins t3 t1 && wins t3 t2 then Third else
-  --                 Aiko
 
 
 
@@ -274,11 +263,6 @@ namespace MyNat -- Nat を新しく定義する
   -- S (S O) (* 期待している値 *) : Nat
 
   -- 練習問題 2.3 mult を正しく定義せよ．
-  -- mult : (m, n : Nat) -> Nat
-  -- mult O n = O
-  -- mult (S m') n = plus (mult m' n) n
-  -- λΠ> mult (S (S O)) (S O)
-  -- S (S O) : Nat
 
 
 -- 文字列の扱い
@@ -321,12 +305,3 @@ removeHeadSpaces s = ""
 
 
 -- 練習問題 2.4 remove head spaces を正しく定義せよ
--- removeHeadSpaces : (s : String) -> String
--- removeHeadSpaces s = pack (f (unpack s))
--- where
---   f : List Char -> List Char
---   f (' ' :: s') = f s'
---   f s'           = s'
-
--- λΠ> removeHeadSpaces "   hello"
--- "hello" : String
