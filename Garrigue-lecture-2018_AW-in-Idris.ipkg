@@ -4,6 +4,6 @@ version = "0.1.0"
 author = "κeen <3han5chou7@gmail.com>"
 
 sourcedir = src
-modules = Idris1
+modules = Idris1, Idris2
 opts = "--check --total -X ElabReflection"
 pkgs = pruviloj
