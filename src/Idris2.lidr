@@ -359,3 +359,70 @@ Coqの帰納的データ型に対して，値を破壊しながら中身を取�
 -- Eitherの分解どうするの？？？
 -- >     orComm : Either p q -> Either q p
 -- >     orComm = ?hole
+
+
+練習問題4.1以下の定理をCoqで証明せよ
+
+> namespace Idris2
+>   parameters(p, q, r: Type)
+>     impTrans : (p -> q) -> (q -> r) -> p -> r
+>     impTrans = %runElab (do
+>       intro `{{Hpq}}
+>       intro `{{Hqr}}
+>       intro `{{Hp}}
+>       apply (Var `{{Hqr}}) [False]; solve
+>       apply (Var `{{Hpq}}) [False]; solve
+>       hypothesis
+>     )
+
+>     notFalse : Not Void
+>     notFalse = %runElab (do
+>       intro `{{Hvoid}}
+>       hypothesis
+>     )
+
+>     doubleNeg : p -> Not (Not p)
+>     doubleNeg = %runElab (do
+>       intro `{{Hp}}
+>       intro `{{Hnp}}
+>       apply (Var `{{Hnp}}) [False]; solve
+>       hypothesis
+>     )
+
+>     contraposition : (p -> q) -> Not q ->Not p
+>     contraposition = %runElab (do
+>       intro `{{Hpq}}
+>       intro `{{Hnq}}
+>       intro `{{Hp}}
+>       apply (Var `{{Hnq}}) [False]; solve
+>       apply (Var `{{Hpq}}) [False]; solve
+>       hypothesis
+>     )
+
+
+>     andAssoc : (p, (q, r)) -> ((p, q), r)
+>     andAssoc = %runElab (do
+>       intro `{{Hpqr}}
+>       both (Var `{{Hpqr}}) `{{Hp}} `{{Hqr}}
+>       both (Var `{{Hqr}}) `{{Hq}} `{{Hr}}
+>       construct `andThen` (try hypothesis)
+>       construct `andThen` (hypothesis)
+>       pure ()
+>     )
+
+-- >     andDistr : (p, Either q r) -> Either (p, q) (p, r)
+-- >     andDistr = %runElab (do
+-- >       intro `{{Hpqr}}
+-- >       both (Var `{{Hpqr}}) `{{Hp}} `{{Hqr}}
+-- >       -- Eitherをばらせない
+-- >     )
+
+
+>     absurd : p -> Not p -> q
+>     absurd = %runElab (do
+>       intro `{{Hp}}
+>       intro `{{Hnp}}
+>       apply `(void {a=~(Var `{{q}})}) [False]; solve
+>       apply (Var `{{Hnp}}) [False]; solve
+>       hypothesis)
+
