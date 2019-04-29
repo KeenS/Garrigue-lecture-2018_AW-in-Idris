@@ -4,6 +4,7 @@
 メモ: 後で使うのでインポートしておく
 
 > import Pruviloj.Core
+> import Pruviloj.Induction
 > %language ElabReflection
 
 1 プログラムの型付け型
@@ -276,3 +277,85 @@ hole: No more goals.
 > -- λΠ> :printdef andSelf'
 > -- andSelf' : (p : Type) -> Type -> p -> (p, p)
 > -- andSelf' p q = \Hp => (Hp, Hp)
+
+
+否定に関する定理
+
+> namespace Negation
+>   parameters(p, q: Type)
+>     -- orに相当するのはEither
+>     deMorgan : (Not (Either p q) ) -> (Not p, Not q)
+>     deMorgan = %runElab (do
+>       intro `{{Hnpq}}
+>       -- Coq     -   Idris
+>       -- split       construct
+>       -- ;       -   `andThen
+>       --
+>       -- Idrisではintroの前にattackしとかないとエラーになる。
+>       -- 複数のtacticの合成は安直には`do`を使う。
+>       construct `andThen` (do
+>         attack
+>         intro `{{Hq}})
+>       -- 別解として `*>` を使う方法もある
+>       -- construct `andThen` (attack *> intro `{{Hq}})
+>
+>       -- このあたりはtacticのあとに都度solveが必要なのでsolveを1行にまとめる
+>       apply (Var `{{Hnpq}}) [False]; solve
+>       -- Coqのleft相当。Idrisの関数 `Left` を適用しているだけだが、型を明示的に示さないといけないので長い。
+>       apply `(Right {a=~(Var `{{p}})} {b=~(Var `{{q}})}) [False]; solve
+>       hypothesis; solve
+>       -- 以後同様。
+>       apply (Var `{{Hnpq}}) [False]; solve
+>       apply `(Left {a=~(Var `{{p}})} {b=~(Var `{{q}})}) [False]; solve
+>       hypothesis; solve
+>     )
+
+
+
+しかし，双対的な定理 `(:(P^Q) :P_ :Q)`は直観主義論理ではなりたたない．????コマンドによって二重否定の除去を仮定すると証明できる．
+
+メモ: 仮説、公理を定義するコマンドが分からなかったのでbelieve_meで無理やりclassicを定義する
+
+>     classic : Not (Not a) -> a
+>     classic = believe_me
+
+>     deMorgan' : (Not (p, q) ) -> Either (Not p) (Not q)
+>     deMorgan' = %runElab (do
+>       intro `{{Hnpq}}
+>       apply `(classic {p=~(Var `{{p}})} {q=~(Var `{{q}})} {a=(Either (Not ~(Var `{{p}})) (Not ~(Var `{{q}})))}) [False]; solve
+>       attack
+>       intro `{{Hnnpq}}
+>       apply (Var `{{Hnpq}}) [False]; solve
+>       -- idris だと型を明示しないといけない関係でconstruct `andThen` (apply classic)と書けない
+>       construct
+>       apply `(classic {p=~(Var `{{p}})} {q=~(Var `{{q}})}{a=~(Var `{{p}})}) [False];  solve
+>       attack
+>       intro `{{Hnp}}
+>       apply (Var `{{Hnnpq}}) [False]; solve
+>       apply `(Left {a=(Not ~(Var `{{p}}))} {b=(Not ~(Var `{{q}}))}) [False]; solve
+>       hypothesis; solve
+>       apply `(classic {p=~(Var `{{p}})} {q=~(Var `{{q}})}{a=~(Var `{{q}})}) [False]; solve
+>       attack
+>       intro `{{Hnq}}
+>       apply (Var `{{Hnnpq}}) [False]; solve
+>       apply `(Right {a=(Not ~(Var `{{p}}))} {b=(Not ~(Var `{{q}}))}) [False]; solve
+>       hypothesis; solve; solve)
+
+
+仮定を破壊する
+
+Coqの帰納的データ型に対して，値を破壊しながら中身を取り出すというtacticが便利である．直接に対応する論理規則はないが，当然ながら他の論理規則から同じ結果を導くことは可能である．
+
+> namespace Destruct
+>   parameters(p, q : Type)
+>     andComm : (p, q) -> (q, p)
+>     andComm = %runElab (do
+>       intro `{{Hpq}}
+>       -- タプル専用 split .. as .. 相当のものとして both がある
+>       both (Var `{{Hpq}}) `{{Hp}} `{{Hq}}
+>       construct `andThen` hypothesis
+>       pure ())
+
+-- Eitherの分解どうするの？？？
+-- >     orComm : Either p q -> Either q p
+-- >     orComm = ?hole
